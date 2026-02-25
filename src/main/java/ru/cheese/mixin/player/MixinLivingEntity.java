@@ -1,0 +1,67 @@
+package ru.cheese.mixin.player;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import ru.cheese.manager.IMinecraft;
+import ru.cheese.manager.Manager;
+import ru.cheese.modules.combat.rotation.RotationController;
+import ru.cheese.modules.render.SwingAnimations;
+
+@Mixin(LivingEntity.class)
+public abstract class MixinLivingEntity implements IMinecraft {
+    @Inject(method = "getHandSwingDuration", at = {@At("HEAD")}, cancellable = true)
+    private void getArmSwingAnimationEnd(final CallbackInfoReturnable<Integer> info) {
+        SwingAnimations swingAnimations = Manager.FUNCTION_MANAGER.swingAnimations;
+        if (swingAnimations.state && swingAnimations.slowAnimation.get()) {
+            info.setReturnValue(swingAnimations.slowAnimationSpeed.get().intValue());
+        }
+    }
+
+    @Shadow
+    public abstract float getJumpVelocity();
+
+    @Shadow
+    protected abstract double getGravity();
+
+    @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
+    private void onJump(CallbackInfo ci) {
+        if ((Object) this != mc.player) return;
+        Float yaw = null;
+        if (yaw == null) {
+            return;
+        }
+
+        float jumpVelocity = getJumpVelocity();
+        if (jumpVelocity <= 1.0E-5F) {
+            ci.cancel();
+            return;
+        }
+
+        Vec3d currentVelocity = mc.player.getVelocity();
+        mc.player.setVelocity(currentVelocity.x, Math.max(jumpVelocity, currentVelocity.y), currentVelocity.z);
+
+        if (mc.player.isSprinting()) {
+            float yawRad = yaw * ((float) Math.PI / 180.0F);
+            double x = -MathHelper.sin(yawRad) * 0.2;
+            double z = MathHelper.cos(yawRad) * 0.2;
+            mc.player.addVelocityInternal(new Vec3d(x, 0.0, z));
+        }
+
+        mc.player.velocityDirty = true;
+        ci.cancel();
+    }
+
+
+    @Inject(method = "calcGlidingVelocity", at = @At("HEAD"), cancellable = true)
+    private void onCalcGlidingVelocity(Vec3d oldVelocity, CallbackInfoReturnable<Vec3d> cir) {
+        if (!((Object) this == mc.player)) return;
+        RotationController rotationController = Manager.ROTATION;
+    }
+}

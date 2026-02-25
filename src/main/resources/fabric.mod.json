@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "cheesevisuals",
+	"version": "${version}",
+	"name": "CheeseVisuals",
+	"description": "Спизженные визуалы из слитых сурсов СНГ софта.",
+	"authors": [
+		"MrCrasher"
+	],
+	"contact": {
+		"homepage": "WIP",
+		"sources": "https://github.com/Govnokoder123"
+	},
+	"license": "GPL v3",
+	"icon": "assets/cheesevisuals/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"ru.cheese.CheeseVisuals"
+		]
+	},
+	"mixins": [
+		"cheesevisuals.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.14",
+		"minecraft": "~1.21.4",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
