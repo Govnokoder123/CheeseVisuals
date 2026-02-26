@@ -7,9 +7,9 @@ public class NativeProfile {
     private static String expiryDate;
 
     static {
-        username = System.getProperty("levin.username", "N/A");
-        role = System.getProperty("levin.role", "Unknown role");
-        expiryDate = System.getProperty("levin.expiry", "Unknown date!");
+        username = System.getProperty("user", "N/A");
+        role = System.getProperty("role", "Unknown role");
+        expiryDate = System.getProperty("expdate", "Unknown date!");
     }
 
     public NativeProfile(String name, String role, String expiry) {
